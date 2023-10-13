@@ -1,0 +1,220 @@
+{% include "header.html" %}
+
+  <div class="container">
+
+    <!----- CHANGE LIST NAME ----->
+    <header class="d-flex flex-wrap py-3 mb-4 border-bottom">
+      <form action="{{ url_for('rename_list', list_url=this_list.url, list_id=this_list.id) }}" method="POST" autocomplete="off">
+        <input class="form-control-plaintext mb-0 fs-3 fw-bold" type="text" name="name" value="{{ this_list.name }}" size="{{ title | resize_input }}">
+        <input type="submit" hidden="hidden">
+      </form>
+
+      <ul class="nav nav-pills  ms-auto">
+        {% if not this_list.is_saved %}
+          {% if current_user.is_authenticated %}
+          <li class="nav-item"><a href="{{ url_for('save_list', list_url=this_list.url) }}"><button type="button" class="btn btn-primary m-0">Save This List</button></a></li>
+          {% else %}
+          <li class="nav-item"><button type="button" class="btn btn-primary m-0"  data-bs-toggle="modal" data-bs-target="#loginModalToggle">Save This List</button></li>
+          {% endif %}
+        {% else %}
+        <li class="nav-item"><a href="{{ url_for('delete_list', list_url=this_list.url) }}"><button type="button" class="btn btn-danger m-0">Delete This List</button></a></li>
+        {% endif %}
+      </ul>
+    </header>
+
+    <!----- ADD NEW TASK ----->
+    <form class="mb-4" action="{{ url_for('new_task', list_url=this_list.url, list_id=this_list.id) }}" method="POST">
+      <input type="text" name="name" class="fs-4 form-control" placeholder="Add new task..." autocomplete="off" style="width: 100%" required>
+      <input type="submit" hidden="hidden">
+    </form>
+
+    <!----- ALL STARTED TASKS IN THE LIST ----->
+    <ul class="task-list-started">
+      {% for task in data %}
+      {% if task.is_started and not task.is_done %}
+      <li class="item-started" draggable="true">
+        <!-- TASK -->
+        <div class="d-flex flex-row align-items-center my-3 border rounded py-1 task-started">
+          <!-- Draggable Dots -->
+          <img class="me-2 to-drag" src="{{ url_for('static', filename='/svg/draggable_dots.svg') }}" width="20px" height="20px" draggable="false">
+          <!-- EDIT TASK -->
+          <form class="row row-cols-lg-auto align-items-center me-auto" method="POST" action="{{ url_for('edit_task', list_url=this_list.url, task_id=task.id) }}">
+            <!-- CHECK BOX -->
+            <div class="col-1 col-md-auto pe-2">
+              <div class="form-check">
+                {% if task.is_done %}
+                <input class="form-check-input" type="checkbox" name="is_done" checked onchange="this.form.submit()">
+                {% else %}
+                <input class="form-check-input" type="checkbox" name="is_done" onchange="this.form.submit()">
+                {% endif %}
+              </div>
+            </div>
+            <!-- TASK NAME -->
+            <div class="col-10 col-md-auto px-md-0 pe-2">
+              <input name="name" type="text" class="form-control-plaintext" value="{{ task.name }}" size="{{ task.name | resize_input }}" autocomplete="off">
+            </div>
+            <!-- TASK DATE -->
+            <div class="col-12 col-md-auto">
+                <input type="date" value="{{ task.due_date }}" name="due_date" onchange="this.form.submit()">
+            </div>
+            <input type="submit" hidden="hidden">
+          </form>
+
+          <nav class="navbar navbar-expand-lg p-0 m-0">
+            <div class="container">
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#options_started{{ task.id }}" aria-controls="options_started{{ task.id }}" aria-expanded="false">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+
+              <div class="collapse navbar-collapse" id="options_started{{ task.id }}">
+                <ul class="navbar-nav justify-content-end flex-grow-1">
+                  <!-- START TASK -->
+                  <li class="nav-item">
+                    {% if task.is_started %}
+                    <a class="nav-link" href="{{ url_for('start_task', list_url=this_list.url, task_id=task.id, value=0) }}"><img src="{{ url_for('static', filename='/svg/star_fill.svg') }}" width="20px" height="20px"></a>
+                    {% else %}
+                    <a class="nav-link" href="{{ url_for('start_task', list_url=this_list.url, task_id=task.id, value=1) }}"><img src="{{ url_for('static', filename='/svg/star_empty.svg') }}" width="20px" height="20px"></a>
+                    {% endif %}
+                  </li>
+                  <!-- DELETE TASK -->
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('delete_task', list_url=this_list.url, task_id=task.id) }}"><img src="{{ url_for('static', filename='/svg/delete.svg') }}" width="20px" height="20px"></a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+        </div>
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+
+    <!----- ALL NOT STARTED AND COMPLETED TASKS IN THE LIST ----->
+    <ul class="task-list">
+      {% for task in data %}
+      {% if not task.is_started and not task.is_done %}
+      <li class="item" draggable="true">
+        <!-- TASK -->
+        <div class="d-flex flex-row align-items-center my-3 border rounded py-1 task">
+          <!-- Draggable Dots -->
+          <img class="me-2 to-drag" src="{{ url_for('static', filename='/svg/draggable_dots.svg') }}" width="20px" height="20px" draggable="false">
+          <!-- EDIT TASK -->
+          <form class="row row-cols-lg-auto align-items-center me-auto" method="POST" action="{{ url_for('edit_task', list_url=this_list.url, task_id=task.id) }}">
+            <!-- CHECK BOX -->
+            <div class="col-1 col-md-auto pe-2">
+              <div class="form-check">
+                {% if task.is_done %}
+                <input class="form-check-input" type="checkbox" name="is_done" checked onchange="this.form.submit()">
+                {% else %}
+                <input class="form-check-input" type="checkbox" name="is_done" onchange="this.form.submit()">
+                {% endif %}
+              </div>
+            </div>
+            <!-- TASK NAME -->
+            <div class="col-10 col-md-auto px-md-0 pe-2">
+              <input name="name" type="text" class="form-control-plaintext" value="{{ task.name }}" size="{{ task.name | resize_input }}" autocomplete="off">
+            </div>
+            <!-- TASK DATE -->
+            <div class="col-12 col-md-auto">
+                <input type="date" value="{{ task.due_date }}" name="due_date" onchange="this.form.submit()">
+            </div>
+            <input type="submit" hidden="hidden">
+          </form>
+
+          <nav class="navbar navbar-expand-lg p-0 m-0">
+            <div class="container">
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#options{{ task.id }}" aria-controls="options{{ task.id }}" aria-expanded="false">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+
+              <div class="collapse navbar-collapse" id="options{{ task.id }}">
+                <ul class="navbar-nav justify-content-end flex-grow-1">
+                  <!-- START TASK -->
+                  <li class="nav-item">
+                    {% if task.is_started %}
+                    <a class="nav-link" href="{{ url_for('start_task', list_url=this_list.url, task_id=task.id, value=0) }}"><img src="{{ url_for('static', filename='/svg/star_fill.svg') }}" width="20px" height="20px"></a>
+                    {% else %}
+                    <a class="nav-link" href="{{ url_for('start_task', list_url=this_list.url, task_id=task.id, value=1) }}"><img src="{{ url_for('static', filename='/svg/star_empty.svg') }}" width="20px" height="20px"></a>
+                    {% endif %}
+                  </li>
+                  <!-- DELETE TASK -->
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('delete_task', list_url=this_list.url, task_id=task.id) }}"><img src="{{ url_for('static', filename='/svg/delete.svg') }}" width="20px" height="20px"></a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+        </div>
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+
+    <!----- ALL COMPLETED TASKS IN THE LIST ----->
+
+    <ul class="task-list-done">
+      {% for task in data %}
+      {% if task.is_done %}
+      <li class="item-done" draggable="true">
+        <!-- TASK -->
+        <div class="d-flex flex-row align-items-center my-3 border rounded py-1 task-done">
+          <!-- Draggable Dots -->
+          <img class="me-2 to-drag" src="{{ url_for('static', filename='/svg/draggable_dots.svg') }}" width="20px" height="20px" draggable="false">
+          <!-- EDIT TASK -->
+          <form class="row row-cols-lg-auto align-items-center me-auto" method="POST" action="{{ url_for('edit_task', list_url=this_list.url, task_id=task.id) }}">
+            <!-- CHECK BOX -->
+            <div class="col-1 col-md-auto pe-2">
+              <div class="form-check">
+                {% if task.is_done %}
+                <input class="form-check-input" type="checkbox" name="is_done" checked onchange="this.form.submit()">
+                {% else %}
+                <input class="form-check-input" type="checkbox" name="is_done" onchange="this.form.submit()">
+                {% endif %}
+              </div>
+            </div>
+            <!-- TASK NAME -->
+            <div class="col-10 col-md-auto px-md-0 pe-2">
+              <input name="name" type="text" class="form-control-plaintext" value="{{ task.name }}" size="{{ task.name | resize_input }}" autocomplete="off">
+            </div>
+            <!-- TASK DATE -->
+            <div class="col-12 col-md-auto">
+                <input type="date" value="{{ task.due_date }}" name="due_date" onchange="this.form.submit()">
+            </div>
+            <input type="submit" hidden="hidden">
+          </form>
+
+          <nav class="navbar navbar-expand-lg p-0 m-0">
+            <div class="container">
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#options_done{{ task.id }}" aria-controls="options_done{{ task.id }}" aria-expanded="false">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+
+              <div class="collapse navbar-collapse" id="options_done{{ task.id }}">
+                <ul class="navbar-nav justify-content-end flex-grow-1">
+                  <!-- START TASK -->
+                  <li class="nav-item">
+                    {% if task.is_started %}
+                    <a class="nav-link" href="{{ url_for('start_task', list_url=this_list.url, task_id=task.id, value=0) }}"><img src="{{ url_for('static', filename='/svg/star_fill.svg') }}" width="20px" height="20px"></a>
+                    {% else %}
+                    <a class="nav-link" href="{{ url_for('start_task', list_url=this_list.url, task_id=task.id, value=1) }}"><img src="{{ url_for('static', filename='/svg/star_empty.svg') }}" width="20px" height="20px"></a>
+                    {% endif %}
+                  </li>
+                  <!-- DELETE TASK -->
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('delete_task', list_url=this_list.url, task_id=task.id) }}"><img src="{{ url_for('static', filename='/svg/delete.svg') }}" width="20px" height="20px"></a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </nav>
+        </div>
+      </li>
+      {% endif %}
+    {% endfor %}
+    </ul>
+
+  </div>
+
+{% include "footer.html" %}

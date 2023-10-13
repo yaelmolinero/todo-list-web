@@ -1,0 +1,10 @@
+{% include "header.html" %}
+
+<div class="container">
+  <form class="" action="{{ url_for('new_list') }}" method="POST">
+    <input type="text" name="new_task" class="fs-4 form-control my-4" placeholder="Add new task to create list." autocomplete="off" width="100%" required>
+    <input type="submit" hidden="hidden">
+  </form>
+</div>
+
+{% include "footer.html" %}

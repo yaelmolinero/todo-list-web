@@ -1,0 +1,38 @@
+<div class="modal fade p-4 py-md-5" tabindex="-1" role="dialog" id="registerModalToggle" aria-labelledby="registerModalToggleLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header p-5 pb-4 border-bottom-0">
+        <h1 class="fw-bold mb-0 fs-2" id="exampleModalToggleLabel">Register</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body p-5 pt-0">
+        <form class="" action="{{ url_for('register', list_url=this_list.url) }}" method="POST">
+          <div class="form-floating mb-3">
+            {{ register.username(placeholder='name', **{'class': 'form-control rounded-3', 'id': 'floatingInput'}) }}
+            {{ register.username.label(**{'for': 'floatingInput'}) }}
+          </div>
+          <div class="form-floating mb-3">
+            {{ register.email(placeholder='email', **{'class': 'form-control rounded-3', 'id': 'floatingEmail'}) }}
+            {{ register.email.label(**{'for': 'floatingEmail'}) }}
+          </div>
+          <div class="form-floating mb-3">
+            {{ register.password(placeholder=password, **{'class': 'form-control rounded-3', 'id': 'floatingPassword'}) }}
+            {{ register.password.label(**{'for': 'floatingPassword'}) }}
+          </div>
+          <button type="button" class="btn btn-link" data-bs-target="#loginModalToggle" data-bs-toggle="modal">Already have an account?</button>
+          {{ register.submit(**{'class': 'w-100 mb-2 btn btn-lg rounded-3 btn-primary'}) }}
+        </form>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <p class="text-danger">{{ message }}</p>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+      </div>
+    </div>
+  </div>
+</div>

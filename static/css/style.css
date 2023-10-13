@@ -1,0 +1,26 @@
+.task-list-started{
+    list-style: none;
+    padding: 0px;
+}
+
+.item-started.dragging-task-started :where(.task-started) {
+    opacity: 0;
+}
+
+.task-list{
+    list-style: none;
+    padding: 0px;
+}
+
+.item.dragging-task :where(.task) {
+    opacity: 0;
+}
+
+.task-list-done{
+    list-style: none;
+    padding: 0px;
+}
+
+.item-done.dragging-task-done :where(.task-done) {
+    opacity: 0;
+}
